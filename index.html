@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Game</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+
+  <div id="container">
+    <div id="game-container">
+      <h1>Math Game</h1>
+      <div>
+        <button onclick="selectOperator('+')">Addition</button>
+        <button onclick="selectOperator('-')">Subtraction</button>
+        <button onclick="selectOperator('*')">Multiplication</button>
+        <button onclick="selectOperator('/')">Division</button>
+      </div>
+      <p id="problem"></p>
+      <input type="text" id="answer" placeholder="Your answer">
+      <button onclick="checkAnswer()">Submit</button>
+      <p id="result"></p>
+      <p id="score"><span id="currency">0</span></p>
+    </div>
+  </div>
+
+  <script>
+    let score = 0; // Initialize score outside the functions
+    let selectedOperator = '+';
+
+    function selectOperator(operator) {
+      selectedOperator = operator;
+      document.getElementById('problem').innerText = generateProblem();
+    }
+
+    function generateProblem() {
+      const num1 = Math.floor(Math.random() * 10);
+      const num2 = Math.floor(Math.random() * 10);
+
+      switch (selectedOperator) {
+        case '+':
+          return `${num1} + ${num2}`;
+        case '-':
+          // Ensure num1 is greater than or equal to num2 to avoid negative results
+          return `${Math.max(num1, num2)} - ${Math.min(num1, num2)}`;
+        case '*':
+          return `${num1} * ${num2}`;
+        case '/':
+          return `${Math.max(num1, num2)} / ${Math.min(num1, num2)}`;
+        default:
+          return ''; // Handle unexpected operator
+      }
+    }
+
+    function checkAnswer() {
+      const problemElement = document.getElementById('problem');
+      const answerElement = document.getElementById('answer');
+      const resultElement = document.getElementById('result');
+      const scoreElement = document.getElementById('currency');
+
+      const problem = problemElement.innerText;
+      const userAnswer = parseFloat(answerElement.value); // Allow floating-point answers
+
+      const [num1, operator, num2] = problem.split(' ').map(item => isNaN(item) ? item : parseFloat(item));
+      let correctAnswer;
+
+      switch (operator) {
+        case '+':
+          correctAnswer = num1 + num2;
+          break;
+        case '-':
+          correctAnswer = num1 - num2;
+          break;
+        case '*':
+          correctAnswer = num1 * num2;
+          break;
+        case '/':
+          if (num2 == 0) {
+            correctAnswer = "undefined"
+          }
+          correctAnswer = num1 / num2;
+          break;
+      }
+
+      // Check if the user's answer is correct
+      const isCorrect = userAnswer === correctAnswer;
+
+      if (isCorrect) {
+        resultElement.innerText = 'Correct! Well done!';
+        resultElement.style.color = '#4caf50'; // green color for correct
+        score += 10; // Increase score by 10 for each correct answer
+      } else {
+        resultElement.innerText = 'Oops! Try again.';
+        resultElement.style.color = '#e74c3c'; // red color for incorrect
+        score = Math.max(0, score - 5); // Decrease score by 1 for each incorrect answer, but never go below 0
+      }
+
+      scoreElement.innerText = `Score: ${score}`;
+      problemElement.innerText = generateProblem();
+      answerElement.value = '';
+    }
+
+    // Initial problem generation
+    document.getElementById('problem').innerText = generateProblem();
+  </script>
+
+</body>
+</html>
